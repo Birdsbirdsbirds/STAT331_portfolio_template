@@ -1,6 +1,6 @@
 ---
 title: "STAT 331 Portfolio"
-author: "Your Name Goes Here"
+author: "Isaiah Woodard"
 format: html 
 embed-resources: true
 layout: margin-left
@@ -23,6 +23,12 @@ execute:
 ```{r}
 #| label: wd-1-csv-1
 
+# Lab 2 
+
+survey_dat <- read_csv(here("Week2", "Lab2", "surveys.csv"))
+
+# Using read_csv() and here() to specify the file location
+
 ```
 
 -   `csv` Example 2
@@ -30,12 +36,21 @@ execute:
 ```{r}
 #| label: wd-1-csv-2
 
+# Lab 3
+
+teacher_evals <- read_csv(here("Week3", "teacher_evals.csv"))
+
+# Using read_csv() and here() to specify the file location
+
+
 ```
 
 -   `xlsx`
 
 ```{r}
 #| label: wd-1-xlsx
+
+NA
 
 ```
 
@@ -46,12 +61,49 @@ execute:
 ```{r}
 #| label: wd-2-ex-1
 
+# Lab 4 Question 7
+
+plot_data <- ca_childcare %>% 
+  select(region_name, study_year, mc_infant, mc_toddler, mc_preschool) %>% 
+  pivot_longer(cols = c(mc_infant, mc_toddler, mc_preschool),
+               names_to = "Age_Class",
+               values_to = "Median") %>% 
+  mutate(Age_Class = as.factor(Age_Class),
+         Age_Class = fct_recode(.f = Age_Class,
+                                Infant = "mc_infant",
+                                Toddler = "mc_toddler",
+                                Preschool = "mc_preschool"),
+         region_name = fct_reorder2(.f = region_name,
+                                    .x = study_year,
+                                    .y = Median))
+
 ```
 
 -   Example removing specified columns
 
 ```{r}
 #| label: wd-2-ex-2
+
+# Lab 5 
+
+contractor <- facebook_event_checkin %>%
+  mutate(date = ymd(date)) %>% # changes date to a ymd format so I can more easily use `lubridate` functions
+  filter(str_detect(event_name,
+                    pattern = "SQL Symphony Concert"),
+         date %within% interval("2017-12-01", "2017-12-31") # looks for attendees of the SQL Concert in December
+         ) %>%
+  group_by(person_id) %>%
+  filter(n() >= 3) %>% # determines people who attended 3 times
+  select(-c(date)) %>%
+  distinct(.keep_all = TRUE) %>% # reduces redundant entries
+  left_join(y = person,
+            by = join_by(person_id == id)) %>% 
+  left_join(y = drivers_license,
+            by = join_by(license_id == id)) %>% # some joins to access additional data
+  filter(car_make == "Tesla",
+         car_model == "Model S",
+         hair_color == "red",
+         gender == "female") # filters by remaining demographics
 
 ```
 
@@ -218,11 +270,11 @@ execute:
 
 The following assignments satisfy the above criteria:
 
-- Example 1
-- Example 2
-- Example 3
-- Example 4
-- Example 5
+-   Example 1
+-   Example 2
+-   Example 3
+-   Example 4
+-   Example 5
 
 **R-2: I can write well documented and tidy code.**
 
@@ -311,7 +363,7 @@ The following assignments satisfy the above criteria:
 
 ```
 
--   I can modify my plot titles to clearly communicate the data context 
+-   I can modify my plot titles to clearly communicate the data context
 
 ```{r}
 #| label: dvs-2-ex-3
@@ -396,7 +448,7 @@ The following assignments satisfy the above criteria:
 
 **DVS-6: I can create tables which make my summaries clear to the reader.**
 
--   I can modify my column names to clearly communicate the data context 
+-   I can modify my column names to clearly communicate the data context
 
 ```{r}
 #| label: dvs-6-ex-1
@@ -460,10 +512,12 @@ The following assignments satisfy the above criteria:
 
 **PE-2: I can write functions to reduce repetition in my code.**
 
--   Example 1: Function that operates on vectors 
+-   Example 1: Function that operates on vectors
 
 ```{r}
 #| label: pe-2-1
+
+NA
 
 ```
 
@@ -472,12 +526,16 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: pe-2-2
 
+NA
+
 ```
 
 -   Example 3: Function that operates on vectors *or* data frames
 
 ```{r}
 #| label: pe-2-3
+
+NA
 
 ```
 
@@ -495,12 +553,16 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: pe-3-map-1
 
+NA
+
 ```
 
 -   using a `map()` function with **more than one** input (e.g., `map_2()` or `pmap()`)
 
 ```{r}
 #| label: pe-3-map-2
+
+NA
 
 ```
 
@@ -529,12 +591,16 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: dsm-1-1
 
+NA
+
 ```
 
 -   Example 2
 
 ```{r}
 #| label: dsm-1-2
+
+NA
 
 ```
 
@@ -576,3 +642,15 @@ The following assignments satisfy the above criteria:
 <!-- Include an image or a description of feedback you gave that you are proud of (either in a peer review or in Discord). -->
 
 <!-- Include a description of how you grew as a collaborator through the weekly pair programming activities.   -->
+
+## Notes to Self
+
+WD1 - WD7
+
+DVS1 - DVS6
+
+R1 - R3
+
+PE1, PE3, PE4
+
+DSSM2
