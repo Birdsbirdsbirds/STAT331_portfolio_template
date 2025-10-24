@@ -121,12 +121,46 @@ contractor <- facebook_event_checkin %>%
 ```{r}
 #| label: wd-3-numeric-ex-1
 
+# Lab 5 
+
+contractor <- facebook_event_checkin %>%
+  mutate(date = ymd(date)) %>% # changes date to a ymd format so I can more easily use `lubridate` functions
+  filter(str_detect(event_name,
+                    pattern = "SQL Symphony Concert"),
+         date %within% interval("2017-12-01", "2017-12-31") # looks for attendees of the SQL Concert in December
+         ) %>%
+  group_by(person_id) %>%
+  filter(n() >= 3) %>% # determines people who attended 3 times
+  select(-c(date)) %>%
+  distinct(.keep_all = TRUE) %>% # reduces redundant entries
+  left_join(y = person,
+            by = join_by(person_id == id)) %>% 
+  left_join(y = drivers_license,
+            by = join_by(license_id == id)) %>% # some joins to access additional data
+  filter(car_make == "Tesla",
+         car_model == "Model S",
+         hair_color == "red",
+         gender == "female") # filters by remaining demographics
+
 ```
 
 -   Numeric Example 2
 
 ```{r}
 #| label: wd-3-numeric-ex-1
+
+ca_childcare %>% 
+  select(region_name, study_year, mhi_2018) %>% 
+  filter(study_year %in% c(2008, 2018)) %>% 
+  group_by(region_name, study_year) %>% 
+  summarise(median = median(mhi_2018),
+            .groups = "drop") %>% 
+  pivot_wider(names_from = study_year,
+              values_from = median,
+              names_prefix = "Median Household Income ") %>%
+  rename(Region = region_name) %>%
+  arrange(desc(`Median Household Income 2018`))
+
 
 ```
 
@@ -135,6 +169,27 @@ contractor <- facebook_event_checkin %>%
 ```{r}
 #| label: wd-3-character
 
+# Lab 5 
+
+contractor <- facebook_event_checkin %>%
+  mutate(date = ymd(date)) %>% # changes date to a ymd format so I can more easily use `lubridate` functions
+  filter(str_detect(event_name,
+                    pattern = "SQL Symphony Concert"),
+         date %within% interval("2017-12-01", "2017-12-31") # looks for attendees of the SQL Concert in December
+         ) %>%
+  group_by(person_id) %>%
+  filter(n() >= 3) %>% # determines people who attended 3 times
+  select(-c(date)) %>%
+  distinct(.keep_all = TRUE) %>% # reduces redundant entries
+  left_join(y = person,
+            by = join_by(person_id == id)) %>% 
+  left_join(y = drivers_license,
+            by = join_by(license_id == id)) %>% # some joins to access additional data
+  filter(car_make == "Tesla",
+         car_model == "Model S",
+         hair_color == "red",
+         gender == "female") # filters by remaining demographics
+
 ```
 
 -   Character Example 2 (example must use functions from **stringr**)
@@ -142,12 +197,54 @@ contractor <- facebook_event_checkin %>%
 ```{r}
 #| label: wd-3-string
 
+# Lab 5 
+
+contractor <- facebook_event_checkin %>%
+  mutate(date = ymd(date)) %>% # changes date to a ymd format so I can more easily use `lubridate` functions
+  filter(str_detect(event_name,
+                    pattern = "SQL Symphony Concert"),
+         date %within% interval("2017-12-01", "2017-12-31") # looks for attendees of the SQL Concert in December
+         ) %>%
+  group_by(person_id) %>%
+  filter(n() >= 3) %>% # determines people who attended 3 times
+  select(-c(date)) %>%
+  distinct(.keep_all = TRUE) %>% # reduces redundant entries
+  left_join(y = person,
+            by = join_by(person_id == id)) %>% 
+  left_join(y = drivers_license,
+            by = join_by(license_id == id)) %>% # some joins to access additional data
+  filter(car_make == "Tesla",
+         car_model == "Model S",
+         hair_color == "red",
+         gender == "female") # filters by remaining demographics
+
 ```
 
 -   Date (example must use functions from **lubridate**)
 
 ```{r}
 #| label: wd-3-date
+
+# Lab 5 
+
+contractor <- facebook_event_checkin %>%
+  mutate(date = ymd(date)) %>% # changes date to a ymd format so I can more easily use `lubridate` functions
+  filter(str_detect(event_name,
+                    pattern = "SQL Symphony Concert"),
+         date %within% interval("2017-12-01", "2017-12-31") # looks for attendees of the SQL Concert in December
+         ) %>%
+  group_by(person_id) %>%
+  filter(n() >= 3) %>% # determines people who attended 3 times
+  select(-c(date)) %>%
+  distinct(.keep_all = TRUE) %>% # reduces redundant entries
+  left_join(y = person,
+            by = join_by(person_id == id)) %>% 
+  left_join(y = drivers_license,
+            by = join_by(license_id == id)) %>% # some joins to access additional data
+  filter(car_make == "Tesla",
+         car_model == "Model S",
+         hair_color == "red",
+         gender == "female") # filters by remaining demographics
 
 ```
 
