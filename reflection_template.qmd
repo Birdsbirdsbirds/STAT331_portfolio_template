@@ -517,12 +517,36 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: r-2-2
 
+# Lab 5
+
+contractor <- facebook_event_checkin %>%
+  mutate(date = ymd(date)) %>% # changes date to a ymd format so I can more easily use `lubridate` functions
+  filter(str_detect(event_name,
+                    pattern = "SQL Symphony Concert"),
+         date %within% interval("2017-12-01", "2017-12-31") # looks for attendees of the SQL Concert in December
+         ) %>%
+  group_by(person_id) %>%
+  filter(n() >= 3) %>% # determines people who attended 3 times
+  select(-c(date)) %>%
+  distinct(.keep_all = TRUE) %>% # reduces redundant entries
+  left_join(y = person,
+            by = join_by(person_id == id)) %>% 
+  left_join(y = drivers_license,
+            by = join_by(license_id == id)) %>% # some joins to access additional data
+  filter(car_make == "Tesla",
+         car_model == "Model S",
+         hair_color == "red",
+         gender == "female") # filters by remaining demographics
+  
+
 ```
 
 -   Example of function formatting
 
 ```{r}
 #| label: r-2-3
+
+NA
 
 ```
 
@@ -533,12 +557,16 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: r-3-example
 
+NA
+
 ```
 
 -   Example (function stops)
 
 ```{r}
 #| label: r-3-function-stops
+
+NA
 
 ```
 
@@ -551,12 +579,43 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: dvs-1-num
 
+# Lab 4 Question 8
+
+ca_childcare %>% 
+  ggplot(aes(x = mhi_2018,
+             y = mc_infant)) +
+  geom_point() +
+  geom_smooth(method = lm, color = "darkred") +
+  labs(title = "Median Household Income v. Infant Childcare Costs in California",
+       x = "Median Household Income",
+       y = "Median Weekly Childcare Costs") +
+  scale_x_continuous(labels = scales::dollar_format(),
+                     breaks = c(40000, 60000, 80000, 100000)) +
+  scale_y_continuous(labels = scales::dollar_format()) +
+  theme_bw()
+
 ```
 
 -   At least one numeric variable and one categorical variable
 
 ```{r}
 #| label: dvs-2-num-cat
+
+# Lab 3 Question 2
+
+teacher_evals_compare %>%
+  ggplot(mapping = aes(x = sen_level,
+                       fill = SET_level)
+         ) +
+  geom_bar(position = "fill", stat = "count") +
+  scale_fill_manual(values = c("#a880ca", "#ab834a")) +
+  labs(title = "Evaluation of Teachers' Use of Activities",
+       x = "Years of Experience",
+       y = "",
+       fill = "Evaluation Rating") + 
+  scale_y_continuous(labels = scales::percent) +
+  theme_bw() +
+  theme(legend.position = "top")
 
 ```
 
@@ -565,12 +624,33 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: dvs-2-cat
 
+NA
+
 ```
 
 -   Dates (time series plot)
 
 ```{r}
 #| label: dvs-2-date
+
+# Challenge 4
+
+plot_data %>% 
+  ggplot(aes(x = study_year,
+             y = medians,
+             color = category)) +
+  facet_wrap(~ region_name) +
+  geom_point() +
+  scale_x_continuous(breaks = c(2008, 2010, 2012, 2014, 2016, 2018)) +
+  labs(title = "Price of Childcare Over Time in California",
+       subtitle = "Plots subdivided for <span style='color:#009e73;'>center-based</span> and <span     style='color:#d55e00;'>at-home</span> childcare",
+       x = "Study Year",
+       y = "Median Weekly Cost of Childcare ($)") +
+  scale_color_manual(values = c("#009e73", "#d55e00")) +
+  theme_bw() +
+  theme(plot.subtitle = ggtext::element_markdown(),
+        axis.text = element_text(size = 5),
+        legend.position = "")
 
 ```
 
@@ -581,12 +661,60 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: dvs-2-ex-1
 
+# Challenge 4
+
+plot_data %>% 
+  ggplot(aes(x = study_year,
+             y = medians,
+             color = category)) +
+  facet_wrap(~ region_name) +
+  geom_point() +
+  scale_x_continuous(breaks = c(2008, 2010, 2012, 2014, 2016, 2018)) +
+  labs(title = "Price of Childcare Over Time in California",
+       subtitle = "Plots subdivided for <span style='color:#009e73;'>center-based</span> and <span     style='color:#d55e00;'>at-home</span> childcare",
+       x = "Study Year",
+       y = "Median Weekly Cost of Childcare ($)") +
+  scale_color_manual(values = c("#009e73", "#d55e00")) +
+  theme_bw() +
+  theme(plot.subtitle = ggtext::element_markdown(),
+        axis.text = element_text(size = 5),
+        legend.position = "")
+
 ```
 
 -   I can modify my colors to be accessible to anyone's eyes
 
 ```{r}
 #| label: dvs-2-ex-2
+
+# Lab 4 Question 7
+
+# Modified to use Brewer Palette "Set2", which is colorblind-friendly
+
+mycolors <- colorRampPalette(brewer.pal(8, "Set2"))(10)
+
+plot_data %>% 
+   ggplot(mapping = aes(x = study_year,
+                        y = Median,
+                        color = region_name)) +
+  facet_wrap(~ factor(Age_Class, c("Infant", "Toddler", "Preschool"))) +
+  geom_point(size = 1) +
+  geom_smooth(method = "loess",
+              linewidth = 0.8) + 
+  labs(title = "Weekly Median Price for Center-based Childcare ($)",
+       x = "Study Year",
+       y = "",
+       color = "California Region") +
+  scale_color_manual(values = mycolors) +
+  scale_x_continuous(n.breaks = 6) +
+  scale_y_continuous(limits = c(100, 500)) +
+  theme_bw() +
+  theme(aspect.ratio = 1,
+        axis.text = element_text(size = 7),
+        legend.text = element_text(size = 6),
+        legend.title = element_text(size = 9),
+        legend.key.height = unit(0.5, 'cm'),
+        plot.title = element_text(size = 10, vjust = 3))
 
 ```
 
@@ -595,6 +723,33 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: dvs-2-ex-3
 
+# Lab 4 Question 7
+
+mycolors <- colorRampPalette(brewer.pal(8, "Set2"))(10)
+
+plot_data %>% 
+   ggplot(mapping = aes(x = study_year,
+                        y = Median,
+                        color = region_name)) +
+  facet_wrap(~ factor(Age_Class, c("Infant", "Toddler", "Preschool"))) +
+  geom_point(size = 1) +
+  geom_smooth(method = "loess",
+              linewidth = 0.8) + 
+  labs(title = "Weekly Median Price for Center-based Childcare ($)",
+       x = "Study Year",
+       y = "",
+       color = "California Region") +
+  scale_color_manual(values = mycolors) +
+  scale_x_continuous(n.breaks = 6) +
+  scale_y_continuous(limits = c(100, 500)) +
+  theme_bw() +
+  theme(aspect.ratio = 1,
+        axis.text = element_text(size = 7),
+        legend.text = element_text(size = 6),
+        legend.title = element_text(size = 9),
+        legend.key.height = unit(0.5, 'cm'),
+        plot.title = element_text(size = 10, vjust = 3))
+
 ```
 
 -   I can modify the text in my plot to be more readable
@@ -602,12 +757,66 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: dvs-2-ex-4
 
+# Lab 4 Question 7
+
+mycolors <- colorRampPalette(brewer.pal(8, "Set2"))(10)
+
+plot_data %>% 
+   ggplot(mapping = aes(x = study_year,
+                        y = Median,
+                        color = region_name)) +
+  facet_wrap(~ factor(Age_Class, c("Infant", "Toddler", "Preschool"))) +
+  geom_point(size = 1) +
+  geom_smooth(method = "loess",
+              linewidth = 0.8) + 
+  labs(title = "Weekly Median Price for Center-based Childcare ($)",
+       x = "Study Year",
+       y = "",
+       color = "California Region") +
+  scale_color_manual(values = mycolors) +
+  scale_x_continuous(n.breaks = 6) +
+  scale_y_continuous(limits = c(100, 500)) +
+  theme_bw() +
+  theme(aspect.ratio = 1,
+        axis.text = element_text(size = 7),
+        legend.text = element_text(size = 6),
+        legend.title = element_text(size = 9),
+        legend.key.height = unit(0.5, 'cm'),
+        plot.title = element_text(size = 10, vjust = 3))
+
 ```
 
 -   I can reorder my legend to align with the colors in my plot
 
 ```{r}
 #| label: dvs-2-ex-5
+
+# Lab 4 Question 7
+
+mycolors <- colorRampPalette(brewer.pal(8, "Set2"))(10)
+
+plot_data %>% 
+   ggplot(mapping = aes(x = study_year,
+                        y = Median,
+                        color = region_name)) +
+  facet_wrap(~ factor(Age_Class, c("Infant", "Toddler", "Preschool"))) +
+  geom_point(size = 1) +
+  geom_smooth(method = "loess",
+              linewidth = 0.8) + 
+  labs(title = "Weekly Median Price for Center-based Childcare ($)",
+       x = "Study Year",
+       y = "",
+       color = "California Region") +
+  scale_color_manual(values = mycolors) +
+  scale_x_continuous(n.breaks = 6) +
+  scale_y_continuous(limits = c(100, 500)) +
+  theme_bw() +
+  theme(aspect.ratio = 1,
+        axis.text = element_text(size = 7),
+        legend.text = element_text(size = 6),
+        legend.title = element_text(size = 9),
+        legend.key.height = unit(0.5, 'cm'),
+        plot.title = element_text(size = 10, vjust = 3))
 
 ```
 
@@ -618,12 +827,58 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: dvs-3-1-ex-1
 
+# Lab 4 Question 7
+
+mycolors <- colorRampPalette(brewer.pal(8, "Set2"))(10)
+
+plot_data %>% 
+   ggplot(mapping = aes(x = study_year,
+                        y = Median,
+                        color = region_name)) +
+  facet_wrap(~ factor(Age_Class, c("Infant", "Toddler", "Preschool"))) +
+  geom_point(size = 1) +
+  geom_smooth(method = "loess",
+              linewidth = 0.8) + 
+  labs(title = "Weekly Median Price for Center-based Childcare ($)",
+       x = "Study Year",
+       y = "",
+       color = "California Region") +
+  scale_color_manual(values = mycolors) +
+  scale_x_continuous(n.breaks = 6) +
+  scale_y_continuous(limits = c(100, 500)) +
+  theme_bw() +
+  theme(aspect.ratio = 1,
+        axis.text = element_text(size = 7),
+        legend.text = element_text(size = 6),
+        legend.title = element_text(size = 9),
+        legend.key.height = unit(0.5, 'cm'),
+        plot.title = element_text(size = 10, vjust = 3))
+
 ```
 
 -   I can use non-standard colors (Example 2)
 
 ```{r}
 #| label: dvs-3-1-ex-2
+
+# Challenge 4
+
+plot_data %>% 
+  ggplot(aes(x = study_year,
+             y = medians,
+             color = category)) +
+  facet_wrap(~ region_name) +
+  geom_point() +
+  scale_x_continuous(breaks = c(2008, 2010, 2012, 2014, 2016, 2018)) +
+  labs(title = "Price of Childcare Over Time in California",
+       subtitle = "Plots subdivided for <span style='color:#009e73;'>center-based</span> and <span     style='color:#d55e00;'>at-home</span> childcare",
+       x = "Study Year",
+       y = "Median Weekly Cost of Childcare ($)") +
+  scale_color_manual(values = c("#009e73", "#d55e00")) +
+  theme_bw() +
+  theme(plot.subtitle = ggtext::element_markdown(),
+        axis.text = element_text(size = 5),
+        legend.position = "")
 
 ```
 
@@ -632,12 +887,16 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: dvs-3-2
 
+NA
+
 ```
 
 -   I can choose creative geometries (e.g., `geom_segment()`, `geom_ribbon)()`)
 
 ```{r}
 #| label: dvs-3-3
+
+NA
 
 ```
 
@@ -647,6 +906,18 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: dvs-4-summarize
+
+# Challenge 4
+
+plot_data <- ca_childcare %>% 
+  select(region_name, study_year, mfccsa, mcsa) %>% 
+  filter(study_year == c(2008:2018)) %>% 
+  group_by(region_name, study_year) %>% 
+  summarise(median_mcsa = median(mcsa),
+            median_mfccsa = median(mfccsa)) %>% 
+  pivot_longer(cols = c(median_mcsa, median_mfccsa),
+               names_to = "category",
+               values_to = "medians")
 
 ```
 
@@ -664,12 +935,30 @@ The following assignments satisfy the above criteria:
 ```{r}
 #| label: dvs-5-1
 
+# Challenge 4
+
+plot_data <- ca_childcare %>% 
+  select(region_name, study_year, mfccsa, mcsa) %>% 
+  filter(study_year == c(2008:2018)) %>% 
+  group_by(region_name, study_year) %>% 
+  summarise(median_mcsa = median(mcsa),
+            median_mfccsa = median(mfccsa)) %>% 
+  pivot_longer(cols = c(median_mcsa, median_mfccsa),
+               names_to = "category",
+               values_to = "medians")
+
 ```
 
 -   Example 2
 
 ```{r}
 #| label: dvs-5-2
+
+# Lab 3 Question 6
+
+teacher_evals_clean %>% 
+  summarise(unique_instructors = n_distinct(teacher_id),
+            unique_courses = n_distinct(course_id))
 
 ```
 
@@ -679,6 +968,8 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: dvs-6-ex-1
+
+
 
 ```
 
