@@ -10,7 +10,7 @@ execute:
   echo: true
 ---
 
-[**My Grade:**]{.underline} I believe my grade equivalent to course work evidenced below to be an \_\_.
+[**My Grade:**]{.underline} I believe my grade equivalent to course work evidenced below to be a C+.
 
 [**Learning Objective Evidence:**]{.underline} In the code chunks below, provide code from Lab or Challenge assignments where you believe you have demonstrated proficiency with the specified learning target. Be sure to specify **where** the code came from (e.g., Lab 4 Question 2).
 
@@ -32,6 +32,8 @@ survey_dat <- read_csv(here("Week2", "Lab2", "surveys.csv"))
 ```
 
 -   `csv` Example 2
+
+*Code Feedback: Use the here() function when reading in csv files to specify the file pathway*
 
 ```{r}
 #| label: wd-1-csv-2
@@ -112,7 +114,7 @@ contractor <- facebook_event_checkin %>%
 ```{r}
 #| label: wd-2-ex-3
 
-
+NA
 
 ```
 
@@ -241,6 +243,8 @@ contractor <- facebook_event_checkin %>%
 
 -   Numeric Example 1
 
+*Code Feedback: Is there a function that allows you to slice the max of a specific variable? Is there a way you can get the max and min in **one** pipeline?*
+
 ```{r}
 #| label: wd-4-numeric-ex-1
 
@@ -263,9 +267,21 @@ teacher_evals_clean %>%
 
 -   Numeric Example 2
 
+*Code Feedback: Is there a function that allows you to slice the max of a specific variable? Is there a way you can get the max and min in **one** pipeline?*
+
 ```{r}
 #| label: wd-4-numeric-ex-2
 
+# Lab 3 Question 11
+
+teacher_evals_clean %>% 
+  filter(seniority == 1) %>% 
+  distinct(course_id, teacher_id, .keep_all = TRUE) %>% # removing instances of repeat questions
+  mutate(avg_perc = mean(percent_failed_cur), .by = teacher_id) %>% 
+  filter(avg_perc == max(avg_perc) | avg_perc == min(avg_perc)) %>% 
+  select(teacher_id, avg_perc) %>% 
+  arrange(avg_perc) %>% 
+  kable()
 
 
 ```
@@ -497,9 +513,9 @@ ca_childcare %>%
 
 The following assignments satisfy the above criteria:
 
--   Example 1
--   Example 2
--   Example 3
+-   Challenge 3
+-   Lab 4
+-   Challenge 4
 -   Example 4
 -   Example 5
 
@@ -509,6 +525,31 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: r-2-1
+
+# Lab 4 Question 7
+
+plot_data %>% 
+   ggplot(mapping = aes(x = study_year,
+                        y = Median,
+                        color = region_name)) +
+  facet_wrap(~ factor(Age_Class, c("Infant", "Toddler", "Preschool"))) + # facet by age class, while specifying order
+  geom_point(size = 1) + # adjusts point size 
+  geom_smooth(method = "loess",
+              linewidth = 0.8) + # adjusts line width 
+  labs(title = "Weekly Median Price for Center-based Childcare ($)",
+       x = "Study Year",
+       y = "",
+       color = "California Region") +
+  scale_color_manual(values = mycolors) + # assigns colors from myColors vector
+  scale_x_continuous(n.breaks = 6) + # specifies breaks 
+  scale_y_continuous(limits = c(100, 500)) + # specifies limits 
+  theme_bw() +
+  theme(aspect.ratio = 1,
+        axis.text = element_text(size = 7), # changes axis text size 
+        legend.text = element_text(size = 6), # changes legend text size 
+        legend.title = element_text(size = 9), # changes legend title size 
+        legend.key.height = unit(0.5, 'cm'), # adjusts legend height 
+        plot.title = element_text(size = 10, vjust = 3)) # Moves up title + adjusts title size  
 
 ```
 
@@ -926,6 +967,8 @@ plot_data <- ca_childcare %>%
 ```{r}
 #| label: dvs-4-across
 
+NA
+
 ```
 
 **DVS-5: I can find summaries of variables across multiple groups.**
@@ -969,7 +1012,27 @@ teacher_evals_clean %>%
 ```{r}
 #| label: dvs-6-ex-1
 
+# Challenge 4
 
+# Renamed columns to be more descriptive
+# Recoded levels to be more descriptive with fct_recode()
+
+plot_data <- ca_childcare %>% 
+  select(region_name, study_year, mfccsa, mcsa) %>% 
+  filter(study_year == c(2008:2018)) %>% 
+  group_by(region_name, study_year) %>% 
+  summarise(median_mcsa = median(mcsa),
+            median_mfccsa = median(mfccsa),
+            .groups = "drop") %>% 
+  pivot_longer(cols = c(median_mcsa, median_mfccsa),
+               names_to = "Type of Childcare",
+               values_to = "Median Weekly Costs") %>% 
+  mutate(`Type of Childcare` = as.factor(`Type of Childcare`),
+         `Type of Childcare` = fct_recode(`Type of Childcare`,
+                                          `Center-based` = "median_mcsa",
+                                          `At-home` = "median_mfccsa")) %>% 
+  rename(Year = study_year,
+         Region = region_name)
 
 ```
 
@@ -986,6 +1049,21 @@ NA
 
 ```{r}
 #| label: dvs-6-ex-3
+
+# Lab 4 Question 5
+
+ca_childcare %>% 
+  select(region_name, study_year, mhi_2018) %>% 
+  filter(study_year %in% c(2008, 2018)) %>% 
+  group_by(region_name, study_year) %>% 
+  summarise(median = median(mhi_2018),
+            .groups = "drop") %>% 
+  pivot_wider(names_from = study_year,
+              values_from = median,
+              names_prefix = "Median Household Income ") %>%
+  rename(Region = region_name) %>%
+  arrange(desc(`Median Household Income 2018`))
+
 
 ```
 
@@ -1262,16 +1340,26 @@ t.test(len ~ supp, data = ToothGrowth, var.equal = FALSE)
 
 <!-- How did you revise your thinking throughout the course? How did you revise your thinking on the code examples you have provided in your portfolio? -->
 
+I've revised my thinking several times throughout the course by taking feedback to make code more efficient or improve readability in my plots and tables. I have consistently resubmitted assignments where many skills were growing. There are many examples here where code has been modified from my original submission (and some which has been modified expressly for use in the portfolio, denoted with comments throughout).
+
 <!-- For the revisions included in your Portfolio, to help me understand the nature of your revisions, please denote somehow the feedback I provided you (e.g., boldface, italics, colored text) before your revisions. -->
+
+Noted in assignment body.
 
 ## Extending My Thinking
 
 <!-- How did you extended your thinking throughout the course? How did you extend your thinking on the code examples you have provided in your portfolio? -->
 
+I've often extended my thinking in this course by applying previously-learned techniques in new ways. I think this is particularly true of my approach to data visualization in challenge 4. For the open-ended analysis, I opted to use HTML editing tools learned in week 2 to add some color directly to the text of my plots - improving readability on what would otherwise be a busy visual.
+
 ## Peer Support & Collaboration
 
 <!-- Include an image or a description of feedback you gave that you are proud of (either in a peer review or in Discord). -->
 
+![](Screenshot Peer Review 1.jpg){width="139"}
+
+![](Screenshot Peer Review 2.jpg){width="140"}
+
 <!-- Include a description of how you grew as a collaborator through the weekly pair programming activities.   -->
 
-## Notes to Self
+I think when I first started doing the pair programming activities, I stuck to my assigned role well, but didn't really know how to support my coding partner if we hit a snag (without telling them a solution I thought of directly). I think I've gotten better at prompting helpful next steps/ resources without centering my own ideas (e.g. saying this reminds me of an example we saw earlier, prompting them to look at the handouts, etc.). I've picked up those habits in part by observing how others have helped me when I hit snags, without making me feel like they were taking over my role.
