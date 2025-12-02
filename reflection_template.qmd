@@ -1356,9 +1356,9 @@ I've often extended my thinking in this course by applying previously-learned te
 
 <!-- Include an image or a description of feedback you gave that you are proud of (either in a peer review or in Discord). -->
 
-![](Screenshot Peer Review 1.jpg){width="139"}
+![](Screenshot%20Peer%20Review%201.jpg){width="139"}
 
-![](Screenshot Peer Review 2.jpg){width="140"}
+![](Screenshot%20Peer%20Review%202.jpg){width="140"}
 
 <!-- Include a description of how you grew as a collaborator through the weekly pair programming activities.   -->
 
