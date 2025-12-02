@@ -1,5 +1,5 @@
 ---
-title: "STAT 331 Portfolio"
+title: "STAT 531 Portfolio"
 author: "Isaiah Woodard"
 format: html 
 embed-resources: true
@@ -10,7 +10,7 @@ execute:
   echo: true
 ---
 
-[**My Grade:**]{.underline} I believe my grade equivalent to course work evidenced below to be a C+.
+[**My Grade:**]{.underline} I believe my grade equivalent to course work evidenced below to be a B+.
 
 [**Learning Objective Evidence:**]{.underline} In the code chunks below, provide code from Lab or Challenge assignments where you believe you have demonstrated proficiency with the specified learning target. Be sure to specify **where** the code came from (e.g., Lab 4 Question 2).
 
@@ -937,7 +937,36 @@ NA
 ```{r}
 #| label: dvs-3-3
 
-NA
+# Lab 10 Question 13 
+
+ciDataframe100 %>% 
+  mutate(number = 1:nrow(ciDataframe100),
+         cover = as.factor(cover)) %>% 
+  ggplot(aes(x = number,
+             y = estimate)) +
+  geom_point(aes(color = cover),
+             size = 0.5) +
+  geom_errorbar(aes(ymin = conf.low, 
+                    ymax = conf.high,
+                    color = cover),
+                size = 0.8) +
+  geom_hline(yintercept = 1, linetype = "dashed", color = "tomato") +
+  scale_color_manual(values = c("tomato", "steelblue3")) +
+  labs(title = "95% Confidence Intervals of Estimated Regression Slope",
+       subtitle = "Based on 100 Simulations. CIs that do not include the slope are colored red",
+       x = "", 
+       y = "Slope Coefficient Estimate") +
+  theme_minimal() +
+  scale_y_continuous(n.breaks = 7,
+                     breaks = c(-0.50, 0.00, 0.50, 1.00, 1.50, 2.00, 2.50)) +
+  theme(legend.position = "",
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5),
+        axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
+  coord_flip()
+  
 
 ```
 
@@ -967,7 +996,11 @@ plot_data <- ca_childcare %>%
 ```{r}
 #| label: dvs-4-across
 
-NA
+# Lab 7 Question 1
+
+fishNAs <- fish %>%
+  filter(if_any(trip:species, is.na)) %>% 
+  summarise(across(everything(), ~ sum(is.na(.x))))
 
 ```
 
@@ -1041,7 +1074,43 @@ plot_data <- ca_childcare %>%
 ```{r}
 #| label: dvs-6-ex-2
 
-NA
+# Lab 9 Question 6
+
+evals_factors %>%
+  distinct(teacher_id, .keep_all = TRUE) %>% 
+  mutate(SET_level = if_else(SET_score_avg >= 4, "excellent", "standard"),
+         sen_level = case_when(seniority <= 4 ~ "junior",
+                               seniority >= 5 & seniority <= 8 ~ "senior",
+                               seniority >= 8 ~ "very senior")
+         ) %>% 
+  select(c(academic_degree, sen_level, sex)) %>% 
+  map_at(.at = c("academic_degree", "sen_level", "sex"),
+         .f = ~ tibble(level = .x) %>% 
+           count(level, name = "n")) %>% 
+  bind_rows(.id = "variable") %>% 
+  mutate(variable = fct_recode(variable,
+                               "Academic Degree" = "academic_degree",
+                               "Seniority Level" = "sen_level",
+                               "Sex" = "sex"),
+         level = fct_recode(level,
+                            "Doctorate" = "dr",
+                            "Masters" = "ma",
+                            "No Degree" = "no_dgr",
+                            "Tenured Professor" = "prof",
+                            "Junior" = "junior",
+                            "Senior" = "senior",
+                            "Very Senior" = "very senior",
+                            "Female" = "female",
+                            "Male" = "male"),
+         Percent = paste0(round((n / sum(n)) * 100, 1), "%")) %>% 
+  kable(col.names = c("Demographic Information", "", "Count", "%")) %>% 
+  collapse_rows(columns = 1) %>% 
+  add_header_above(c(" " = 2, "Quantity" = 2)) %>% 
+  add_header_above(c("Demographic Breakdown for Teacher Evaluations" = 4),
+                   font_size = 20) %>% 
+  kable_styling(full_width = FALSE,
+                bootstrap_options = "striped")
+
 
 ```
 
@@ -1074,7 +1143,19 @@ ca_childcare %>%
 ```{r}
 #| label: dvs-7-ex-1
 
-NA
+# Lab 9 Question 8
+
+enframe(map_int(.x = fish,
+                .f = ~ sum(is.na(.x))),
+        name = "Variable",
+        value = "Count") %>% 
+  gt() %>% 
+  tab_header(title = md("**Number of Missing Values from Fish Surveys**"),
+             subtitle = md("Data collected from 1989 to 2006 on the Blackfoot River in Montana")) %>% 
+  tab_style(style = cell_text(weight = "bold"),
+            locations = cells_column_labels()) %>% 
+  data_color(columns = Count,
+             palette = c("forestgreen", "tomato")) 
 
 ```
 
@@ -1195,7 +1276,11 @@ NA
 ```{r}
 #| label: pe-3-across
 
-NA
+# Lab 7 Question 1
+
+fishNAs <- fish %>%
+  filter(if_any(trip:species, is.na)) %>% 
+  summarise(across(everything(), ~ sum(is.na(.x))))
 
 ```
 
@@ -1204,7 +1289,17 @@ NA
 ```{r}
 #| label: pe-3-map-1
 
-NA
+# Lab 9 Question 3
+
+enframe(map_chr(.x = surveys, 
+                .f = class)) %>%
+  mutate(value = str_to_lower(value)) %>% 
+  arrange(value, name) %>% 
+  kable(col.names = c("Variable", "Data Type"), 
+        bold = TRUE,
+        ) %>% 
+  kable_styling(bootstrap_options = "striped") %>% 
+  add_header_above(c("Portal Study Measurements" = 2))
 
 ```
 
@@ -1213,7 +1308,45 @@ NA
 ```{r}
 #| label: pe-3-map-2
 
-NA
+# Second example of a map() with one input! This example might take several inputs? 
+
+# Lab 9 Question 6
+
+evals_factors %>%
+  distinct(teacher_id, .keep_all = TRUE) %>% 
+  mutate(SET_level = if_else(SET_score_avg >= 4, "excellent", "standard"),
+         sen_level = case_when(seniority <= 4 ~ "junior",
+                               seniority >= 5 & seniority <= 8 ~ "senior",
+                               seniority >= 8 ~ "very senior")
+         ) %>% 
+  select(c(academic_degree, sen_level, sex)) %>% 
+  map_at(.at = c("academic_degree", "sen_level", "sex"),
+         .f = ~ tibble(level = .x) %>% 
+           count(level, name = "n")) %>% 
+  bind_rows(.id = "variable") %>% 
+  mutate(variable = fct_recode(variable,
+                               "Academic Degree" = "academic_degree",
+                               "Seniority Level" = "sen_level",
+                               "Sex" = "sex"),
+         level = fct_recode(level,
+                            "Doctorate" = "dr",
+                            "Masters" = "ma",
+                            "No Degree" = "no_dgr",
+                            "Tenured Professor" = "prof",
+                            "Junior" = "junior",
+                            "Senior" = "senior",
+                            "Very Senior" = "very senior",
+                            "Female" = "female",
+                            "Male" = "male"),
+         Percent = paste0(round((n / sum(n)) * 100, 1), "%")) %>% 
+  kable(col.names = c("Demographic Information", "", "Count", "%")) %>% 
+  collapse_rows(columns = 1) %>% 
+  add_header_above(c(" " = 2, "Quantity" = 2)) %>% 
+  add_header_above(c("Demographic Breakdown for Teacher Evaluations" = 4),
+                   font_size = 20) %>% 
+  kable_styling(full_width = FALSE,
+                bootstrap_options = "striped")
+
 
 ```
 
@@ -1278,7 +1411,7 @@ ca_childcare %>%
 
 ```
 
-## Data Simulation & Statisical Models
+## Data Simulation & Statistical Models
 
 **DSSM-1: I can simulate data from a *variety* of probability models.**
 
@@ -1287,7 +1420,9 @@ ca_childcare %>%
 ```{r}
 #| label: dsm-1-1
 
-NA
+# Lab 10 Question 4
+
+x = runif(100, min = 0, max = 1)
 
 ```
 
@@ -1296,7 +1431,9 @@ NA
 ```{r}
 #| label: dsm-1-2
 
-NA
+# Lab 10 Question 4
+
+ep = rnorm(100, mean = 0, sd = 1)
 
 ```
 
