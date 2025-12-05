@@ -2202,7 +2202,7 @@ vertical-align: -.125em;
 </header>
 
 
-<p><u><strong>My Grade:</strong></u> I believe my grade equivalent to course work evidenced below to be a B+.</p>
+<p><u><strong>My Grade:</strong></u> I believe my grade equivalent to course work evidenced below to be an A-.</p>
 <p><u><strong>Learning Objective Evidence:</strong></u> In the code chunks below, provide code from Lab or Challenge assignments where you believe you have demonstrated proficiency with the specified learning target. Be sure to specify <strong>where</strong> the code came from (e.g., Lab 4 Question 2).</p>
 <section id="working-with-data" class="level2">
 <h2 class="anchored" data-anchor-id="working-with-data">Working with Data</h2>
@@ -2636,7 +2636,7 @@ vertical-align: -.125em;
 <div class="cell">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Lab 5</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Modified this after doing the anti_join below... this works better, but was for some reason harder to wrap my head around (and ultimately less intuitive to me than filtering)</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Modified to use semi_join</span></span>
 <span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>interviewNotNAs <span class="ot">&lt;-</span> interview <span class="sc">%&gt;%</span> </span>
 <span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(transcript))</span>
@@ -2658,7 +2658,7 @@ vertical-align: -.125em;
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Lab 5</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Modified significantly to use an anti-join</span></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Created a new object interviewNAs, then used anti_join</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Created a new object interviewNAs, then used anti_join (works, but is not intuitive)</span></span>
 <span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>interviewNAs <span class="ot">&lt;-</span> interview <span class="sc">%&gt;%</span> </span>
 <span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(transcript))</span>
