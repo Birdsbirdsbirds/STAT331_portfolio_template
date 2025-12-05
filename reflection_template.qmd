@@ -52,7 +52,14 @@ teacher_evals <- read_csv(here("Week3", "teacher_evals.csv"))
 ```{r}
 #| label: wd-1-xlsx
 
-NA
+# Practice Activity 4 Part 1
+
+military <- read_xlsx("gov_spending_per_capita.xlsx",
+                      sheet = "Share of Govt. spending",
+                      skip  = 7,
+                      n_max = 190,
+                      na = c("..", ". .", "xxx")
+                      )
 
 ```
 
@@ -114,7 +121,24 @@ contractor <- facebook_event_checkin %>%
 ```{r}
 #| label: wd-2-ex-3
 
-NA
+# Lab 4 Question 7
+
+# Modified to use starts_with("mc") rather than explicitly naming variables
+
+plot_data <- ca_childcare %>% 
+  select(region_name, study_year, starts_with("mc")) %>% 
+  pivot_longer(cols = c(mc_infant, mc_toddler, mc_preschool),
+               names_to = "Age_Class",
+               values_to = "Median") %>% 
+  mutate(Age_Class = as.factor(Age_Class),
+         Age_Class = fct_recode(.f = Age_Class,
+                                Infant = "mc_infant",
+                                Toddler = "mc_toddler",
+                                Preschool = "mc_preschool"),
+         region_name = fct_reorder2(.f = region_name,
+                                    .x = study_year,
+                                    .y = Median))
+
 
 ```
 
@@ -337,7 +361,22 @@ plot_data <- ca_childcare %>%
 ```{r}
 #| label: wd-4-string
 
-NA
+# Challenge 4
+
+ca_childcare <- ca_childcare %>%  
+  mutate(county_name = str_remove(county_name, " County")) %>% 
+  mutate(region_name = fct_collapse(.f = as.factor(county_name), 
+                                    `Superior California` = superior_counties,
+                                    `North Coast` = north_coast_counties,
+                                    `San Francisco Bay Area` = san_fran_counties,
+                                    `North San Joaquin Valley` = n_san_joaquin_counties,
+                                    `South San Joaquin Valley` = s_san_joaquin_counties,
+                                    `Central Coast` = central_coast_counties,
+                                    `Inland Empire` = inland_counties,
+                                    `Los Angeles County` = la_county,
+                                    `Orange County` = orange_county,
+                                    `San Diego-Imperial` = san_diego_imperial_counties))
+
 
 ```
 
@@ -397,7 +436,14 @@ suspects <- get_fit_now_member %>%
 ```{r}
 #| label: wd-5-right
 
-NA
+# Challenge 4
+
+# Code modified from original to use a right join 
+
+ca_childcare <- tax_rev %>% 
+  right_join(y = ca_childcare,
+            by = join_by(entity_name == county_name,
+                         year == study_year))
 
 ```
 
@@ -435,7 +481,28 @@ contractor <- facebook_event_checkin %>%
 ```{r}
 #| label: wd-5-inner-ex-1
 
-NA
+# Lab 5
+
+# Code modified to use inner joins instead of some left joins
+
+contractor <- facebook_event_checkin %>%
+  mutate(date = ymd(date)) %>% # changes date to a ymd format so I can more easily use `lubridate` functions
+  filter(str_detect(event_name,
+                    pattern = "SQL Symphony Concert"),
+         date %within% interval("2017-12-01", "2017-12-31") # looks for attendees of the SQL Concert in December
+         ) %>%
+  group_by(person_id) %>%
+  filter(n() >= 3) %>% # determines people who attended 3 times
+  select(-c(date)) %>%
+  distinct(.keep_all = TRUE) %>% # reduces redundant entries
+  inner_join(y = person,
+            by = join_by(person_id == id)) %>% 
+  inner_join(y = drivers_license,
+            by = join_by(license_id == id)) %>% # some joins to access additional data
+  filter(car_make == "Tesla",
+         car_model == "Model S",
+         hair_color == "red",
+         gender == "female") # filters by remaining demographics
 
 ```
 
@@ -444,7 +511,13 @@ NA
 ```{r}
 #| label: wd-5-inner-ex-2
 
-NA
+# Lab 5
+
+# Modified from original left_join. I don't think it's better than the left_join, but it works. 
+
+witnesses <-  rbind(witness1, witness2) %>% 
+  inner_join(y = interview,
+            by = join_by(id == person_id))
 
 ```
 
@@ -455,7 +528,22 @@ NA
 ```{r}
 #| label: wd-6-semi
 
-NA
+# Lab 5
+
+# Modified this after doing the anti_join below... this works better, but was for some reason harder to wrap my head around (and ultimately less intuitive to me than filtering)
+
+interviewNotNAs <- interview %>% 
+  filter(!is.na(transcript))
+
+suspects <- get_fit_now_member %>% 
+  filter(membership_status == "gold", # includes only gold members
+         str_detect(id, pattern = "^48Z")) %>% # includes only members whose ID starts with 48Z
+  left_join(y = get_fit_now_check_in,
+            by = join_by(id == membership_id)) %>% 
+  left_join(y = interview,
+            by = join_by(person_id)) %>% 
+  semi_join(y = interviewNotNAs,
+            by = join_by(person_id))
 
 ```
 
@@ -464,7 +552,23 @@ NA
 ```{r}
 #| label: wd-6-anti
 
-NA
+# Lab 5
+
+# Modified significantly to use an anti-join
+# Created a new object interviewNAs, then used anti_join
+
+interviewNAs <- interview %>% 
+  filter(is.na(transcript))
+
+suspects <- get_fit_now_member %>% 
+  filter(membership_status == "gold", # includes only gold members
+         str_detect(id, pattern = "^48Z")) %>% # includes only members whose ID starts with 48Z
+  left_join(y = get_fit_now_check_in,
+            by = join_by(id == membership_id)) %>% 
+  left_join(y = interview,
+            by = join_by(person_id)) %>% 
+  anti_join(y = interviewNAs,
+            by = join_by(person_id))
 
 ```
 
@@ -587,7 +691,33 @@ contractor <- facebook_event_checkin %>%
 ```{r}
 #| label: r-2-3
 
-NA
+# Lab 8 Question 4
+
+# Sets inputs for functions, including optional arguments theme_opt and palette
+
+add_color <- function(plot,
+                       theme_opt = theme_minimal(),
+                       palette = brewer.pal(8, "Accent"),
+                       aes_opt){ 
+  
+  # Sets condition if plots need "fill" specified
+  
+  if(aes_opt == "fill"){
+    plot +
+      theme_opt() +
+      scale_fill_manual(values = palette)
+  }
+  
+  # Sets condition if plots need "color" specified
+  
+  else if (aes_opt == "color"){
+    plot +
+      theme_opt() +
+      scale_color_manual((values = palette))
+  }
+  
+}
+
 
 ```
 
@@ -598,7 +728,33 @@ NA
 ```{r}
 #| label: r-3-example
 
-NA
+# Lab 8 Question 4
+
+# Sets inputs for functions, including optional arguments theme_opt and palette
+
+add_color <- function(plot,
+                       theme_opt = theme_minimal(),
+                       palette = brewer.pal(8, "Accent"),
+                       aes_opt){ 
+  
+  # Sets condition if plots need "fill" specified
+  
+  if(aes_opt == "fill"){
+    plot +
+      theme_opt() +
+      scale_fill_manual(values = palette)
+  }
+  
+  # Sets condition if plots need "color" specified
+  
+  else if (aes_opt == "color"){
+    plot +
+      theme_opt() +
+      scale_color_manual((values = palette))
+  }
+  
+}
+
 
 ```
 
@@ -607,7 +763,25 @@ NA
 ```{r}
 #| label: r-3-function-stops
 
-NA
+# Lab 8 Question 1
+
+rescale_01 <- function(vec){
+  
+  stopifnot("input vector must be numeric" = is.numeric(vec),
+            "input vector must have a length greater than 1" = length(vec) > 1)
+  
+  vec = (vec - min(vec, na.rm = TRUE)) / 
+    (max(vec, na.rm = TRUE) - min(vec, na.rm = TRUE))
+  
+}
+
+rescale_column <- function(df, cols){
+  
+  df %>% 
+    mutate(across({{cols}}, rescale_01))
+  
+}
+
 
 ```
 
@@ -665,7 +839,24 @@ teacher_evals_compare %>%
 ```{r}
 #| label: dvs-2-cat
 
-NA
+# Challenge 4 
+
+plot_data %>% 
+  ggplot(aes(x = study_year,
+             y = medians,
+             color = category)) +
+  facet_wrap(~ census_region) +
+  geom_point() +
+  scale_x_continuous(breaks = c(2008, 2010, 2012, 2014, 2016, 2018)) +
+  labs(title = "Price of Childcare Over Time in California",
+       subtitle = "Plots subdivided for <span style='color:#009e73;'>center-based</span> and <span     style='color:#d55e00;'>at-home</span> childcare",
+       x = "Study Year",
+       y = "Median Weekly Cost of Childcare ($)") +
+  scale_color_manual(values = c("#009e73", "#d55e00")) +
+  theme_bw() +
+  theme(plot.subtitle = ggtext::element_markdown(),
+        axis.text = element_text(size = 5),
+        legend.position = "")
 
 ```
 
@@ -928,7 +1119,39 @@ plot_data %>%
 ```{r}
 #| label: dvs-3-2
 
-NA
+# Lab 10 Question 13
+
+# Modified to include geom_text
+
+ciDataframe100 %>% 
+  mutate(number = 1:nrow(ciDataframe100),
+         cover = as.factor(cover)) %>% 
+  ggplot(aes(x = number,
+             y = estimate)) +
+  geom_point(aes(color = cover),
+             size = 0.5) +
+  geom_errorbar(aes(ymin = conf.low, 
+                    ymax = conf.high,
+                    color = cover),
+                size = 0.8) +
+  geom_hline(yintercept = 1, linetype = "dashed", color = "tomato") +
+  scale_color_manual(values = c("tomato", "steelblue3")) +
+  labs(title = "95% Confidence Intervals of Estimated Regression Slope",
+       subtitle = "Based on 100 Simulations. CIs that do not include the slope are colored red",
+       x = "", 
+       y = "Slope Coefficient Estimate") +
+  geom_text(x = 40, y = -0.5, size = 3, color = "tomato",
+            label = "We expect roughly 5\nsimulations to not\ncontain the slope!") +
+  theme_minimal() +
+  scale_y_continuous(n.breaks = 7,
+                     breaks = c(-0.50, 0.00, 0.50, 1.00, 1.50, 2.00, 2.50)) +
+  theme(legend.position = "",
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5),
+        axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
+  coord_flip()
 
 ```
 
@@ -1236,7 +1459,12 @@ teacher_evals_clean <- teacher_evals %>%
 ```{r}
 #| label: pe-1-map-1
 
-NA
+# Lab 9 Question 4
+
+evals_factors <- evals %>% 
+  map_if(.p = is.character,
+         .f = as.factor) %>% 
+  bind_cols()
 
 ```
 
@@ -1247,7 +1475,25 @@ NA
 ```{r}
 #| label: pe-2-1
 
-NA
+# Lab 10 Question 1
+
+rescale_01 <- function(vec){
+  
+  stopifnot("input vector must be numeric" = is.numeric(vec),
+            "input vector must have a length greater than 1" = length(vec) > 1)
+  
+  vec = (vec - min(vec, na.rm = TRUE)) / 
+    (max(vec, na.rm = TRUE) - min(vec, na.rm = TRUE))
+  
+}
+
+rescale_column <- function(df, cols){
+  
+  df %>% 
+    mutate(across({{cols}}, rescale_01))
+  
+}
+
 
 ```
 
@@ -1256,7 +1502,24 @@ NA
 ```{r}
 #| label: pe-2-2
 
-NA
+# Lab 8 Question 3
+
+make_filled_boxplot <- function(df, cat, num){
+  
+  df %>% 
+    ggplot(aes(x = {{cat}},
+               y = {{num}},
+               fill = {{cat}})) +
+    geom_boxplot() +
+    labs(x = as_label(enquo(cat)) %>% 
+           str_replace_all("_", " ") %>% 
+           str_to_title(),
+         y = as_label(enquo(num)) %>% 
+           str_replace_all("_", " ") %>% 
+           str_to_title()) +
+    theme(legend.position = "")
+  
+}
 
 ```
 
@@ -1477,7 +1740,7 @@ t.test(len ~ supp, data = ToothGrowth, var.equal = FALSE)
 
 <!-- How did you revise your thinking throughout the course? How did you revise your thinking on the code examples you have provided in your portfolio? -->
 
-I've revised my thinking several times throughout the course by taking feedback to make code more efficient or improve readability in my plots and tables. I have consistently resubmitted assignments where many skills were growing. There are many examples here where code has been modified from my original submission (and some which has been modified expressly for use in the portfolio, denoted with comments throughout).
+I've revised my thinking several times throughout the course by taking feedback to make code more efficient or improve readability in my plots and tables. For over half of my submissions, I have resubmitted assignments where many skills were growing. There are examples here where code has been modified from my original submission (and some which has been modified expressly for use in the portfolio, denoted with comments throughout).
 
 <!-- For the revisions included in your Portfolio, to help me understand the nature of your revisions, please denote somehow the feedback I provided you (e.g., boldface, italics, colored text) before your revisions. -->
 
