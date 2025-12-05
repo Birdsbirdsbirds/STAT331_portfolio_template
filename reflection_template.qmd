@@ -1750,7 +1750,7 @@ Noted in assignment body.
 
 <!-- How did you extended your thinking throughout the course? How did you extend your thinking on the code examples you have provided in your portfolio? -->
 
-I've often extended my thinking in this course by applying previously-learned techniques in new ways. I think this is particularly true of my approach to data visualization in challenge 4. For the open-ended analysis, I opted to use HTML editing tools learned in week 2 to add some color directly to the text of my plots - improving readability on what would otherwise be a busy visual.
+I've often extended my thinking in this course by applying previously-learned techniques in new ways. I think this is particularly true of my approach to data visualization in challenge 4. For the open-ended analysis, I opted to use HTML editing tools learned in week 2 to add some color directly to the text of my plots - improving readability on what would otherwise be a busy visual. In much of my code, I've made an effort to be creative and think about usability in my code (e.g. considering resilience to inputs when writing functions + implementing stop functions and messages, thinking of creative ways to present data in tables and plots).
 
 ## Peer Support & Collaboration
 

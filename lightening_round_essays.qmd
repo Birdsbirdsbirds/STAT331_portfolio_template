@@ -6,7 +6,7 @@ editor: visual
 
 **Answer each of the following questions with *one sentence* including a brief explanation.**
 
-1.  Finish the sentence with another student’s name: "If **Elise** doesn’t earn an A, then nobody should, because..." Explain your choice and your reasoning. \
+1.  Finish the sentence with another student’s name: "If **Elise** doesn’t earn an A, then nobody should, because..." Explain your choice and your reasoning.\
     \
     Elise consistently asks helpful questions and provides comments on the class Discord, and their code consistently looks well formatted and produces creative results.
 
